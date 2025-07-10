@@ -3,249 +3,230 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Expense Tracker with Auth</title>
+<title>Budget Buddy</title>
 <style>
-  /* Old style design — simple and clean */
-
+  /* Basic Reset & Styling */
   body {
     font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
     background: #f9f9f9;
-    margin: 0;
-    padding: 0;
     color: #333;
   }
-
   header {
-    background: #4CAF50;
+    background: #0066cc;
     color: white;
     padding: 1rem;
     text-align: center;
-  }
-
-  main {
-    max-width: 600px;
-    margin: 1rem auto;
-    background: white;
-    padding: 1rem 2rem 2rem 2rem;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    border-radius: 5px;
-  }
-
-  h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-weight: normal;
-  }
-
-  label {
-    display: block;
-    margin-top: 1rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
-
+  main {
+    max-width: 900px;
+    margin: 1rem auto;
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 0 8px #ccc;
+    border-radius: 6px;
+  }
+  h2 {
+    margin-top: 0;
+  }
+  form {
+    max-width: 400px;
+    margin: 1rem auto;
+  }
+  label {
+    display: block;
+    margin: 0.5rem 0 0.2rem 0;
+  }
   input[type="text"],
   input[type="email"],
   input[type="password"],
   input[type="number"],
-  input[type="date"],
-  select {
+  select,
+  input[type="date"] {
     width: 100%;
-    padding: 0.5rem;
-    box-sizing: border-box;
-    margin-top: 0.25rem;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
-
-  button {
-    margin-top: 1.5rem;
-    padding: 0.6rem 1rem;
-    border: none;
-    background: #4CAF50;
-    color: white;
-    border-radius: 3px;
-    cursor: pointer;
+    padding: 0.4rem;
     font-size: 1rem;
+    box-sizing: border-box;
   }
-
+  button {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    background: #0066cc;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   button:hover {
-    background: #45a049;
+    background: #004999;
   }
-
+  .message {
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+  }
+  .success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .cheer {
+    background-color: #fff3cd;
+    color: #856404;
+  }
   .hidden {
     display: none;
   }
-
-  .link-btn {
-    background: none;
-    border: none;
-    color: #4CAF50;
-    cursor: pointer;
-    padding: 0;
-    font-size: 0.9rem;
-    text-decoration: underline;
-  }
-
-  .dynamic-expense {
+  .flex-row {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
-
-  .dynamic-expense input[type="text"] {
-    flex: 2;
-  }
-
-  .dynamic-expense input[type="number"] {
-    flex: 1;
-  }
-
-  .remove-expense-btn {
-    flex: 0 0 auto;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    padding: 0 0.5rem;
-    cursor: pointer;
-  }
-
-  .remove-expense-btn:hover {
-    background: #c0392b;
-  }
-
-  .summary {
-    margin-top: 1.5rem;
-    background: #f0f0f0;
+  .card {
+    border: 1px solid #ddd;
     padding: 1rem;
-    border-radius: 4px;
+    border-radius: 6px;
+    background: #fefefe;
   }
-
-  .summary div {
-    margin-bottom: 0.5rem;
+  .card.wide {
+    flex: 1 1 100%;
   }
-
-  .message {
-    margin-top: 1rem;
-    font-weight: bold;
+  .dynamic-expense {
+    margin-top: 0.5rem;
+    border-top: 1px dashed #aaa;
+    padding-top: 0.5rem;
   }
-
-  .message.success {
-    color: green;
-  }
-
-  .message.cheer {
-    color: #d35400;
-  }
-
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    font-size: 0.9rem;
   }
-
+  table, th, td {
+    border: 1px solid #bbb;
+  }
   th, td {
-    border: 1px solid #ddd;
-    padding: 0.4rem 0.6rem;
+    padding: 0.4rem 0.8rem;
     text-align: center;
   }
-
   th {
-    background: #4CAF50;
+    background: #0066cc;
     color: white;
   }
-
-  .filters {
-    margin-top: 1rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-start;
+  .link-button {
+    background: none;
+    border: none;
+    color: #0066cc;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    font-size: 1rem;
   }
-
-  .logout-btn {
-    background: #e74c3c;
-    margin-top: 1rem;
-    width: 100%;
+  .small-text {
+    font-size: 0.9rem;
+    color: #555;
   }
-
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Student Allowance Tracker</h1>
-</header>
+<header>Budget Buddy</header>
 
 <main>
 
-  <!-- LOGIN FORM -->
-  <section id="login-section">
-    <h2>Login</h2>
-    <form id="login-form">
-      <label for="login-email">Email</label>
-      <input type="email" id="login-email" required />
-      <label for="login-password">Password</label>
-      <input type="password" id="login-password" required />
-      <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <button class="link-btn" id="go-signup-btn">Sign up</button></p>
-    <p><button class="link-btn" id="forgot-password-btn">Forgot password?</button></p>
-  </section>
+<!-- LOGIN VIEW -->
+<section id="login-view">
+  <h2>Login</h2>
+  <form id="login-form">
+    <label for="login-email">Email</label>
+    <input type="email" id="login-email" required autocomplete="username" />
+    <label for="login-password">Password</label>
+    <input type="password" id="login-password" required autocomplete="current-password" />
+    <button type="submit">Login</button>
+  </form>
+  <button class="link-button" id="forgot-password-btn">Forgot Password?</button>
+  <p>Don't have an account? <button class="link-button" id="go-signup-btn">Signup here</button></p>
+</section>
 
-  <!-- SIGNUP FORM -->
-  <section id="signup-section" class="hidden">
-    <h2>Sign Up</h2>
-    <form id="signup-form">
-      <label for="signup-nickname">Nickname</label>
-      <input type="text" id="signup-nickname" required />
-      <label for="signup-email">Email</label>
-      <input type="email" id="signup-email" required />
-      <label for="signup-password">Password</label>
-      <input type="password" id="signup-password" required />
-      <button type="submit">Sign Up</button>
-    </form>
-    <p>Already have an account? <button class="link-btn" id="go-login-btn">Login</button></p>
-  </section>
+<!-- SIGNUP VIEW -->
+<section id="signup-view" class="hidden">
+  <h2>Signup</h2>
+  <form id="signup-form">
+    <label for="signup-nickname">Nickname</label>
+    <input type="text" id="signup-nickname" required />
+    <label for="signup-email">Email</label>
+    <input type="email" id="signup-email" required autocomplete="email" />
+    <label for="signup-password">Password</label>
+    <input type="password" id="signup-password" required autocomplete="new-password" />
+    <button type="submit">Signup</button>
+  </form>
+  <p>Already have an account? <button class="link-button" id="go-login-btn">Login here</button></p>
+</section>
 
-  <!-- TRACKER SECTION -->
-  <section id="tracker-section" class="hidden">
+<!-- TRACKER VIEW -->
+<section id="tracker-view" class="hidden">
+  <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1rem;">
     <h2>Welcome, <span id="welcome-nickname">Student</span>!</h2>
-    <button id="logout-btn" class="logout-btn">Logout</button>
+    <button id="logout-btn">Logout</button>
+  </div>
 
-    <form id="tracker-form">
-      <label for="date-picker">Date</label>
-      <input type="date" id="date-picker" required />
+  <div class="card">
+    <h3>Smart Money Management Tips</h3>
+    <ul>
+      <li>Track your expenses daily to know where your money goes.</li>
+      <li>Set a clear savings target and stick to it.</li>
+      <li>Limit your spending on non-essential items.</li>
+      <li>Use budgeting apps or tools to stay organized.</li>
+      <li>Review your expenses weekly and adjust your budget.</li>
+    </ul>
+  </div>
 
-      <label for="allowance-input">Daily Allowance (₱)</label>
-      <input type="number" id="allowance-input" min="0" step="0.01" required />
+  <div class="card" style="margin-top: 1rem;">
+    <label for="date-picker"><strong>Select Date:</strong></label>
+    <input type="date" id="date-picker" required />
+  </div>
 
-      <label for="transport-input">Transportation (₱)</label>
-      <input type="number" id="transport-input" min="0" step="0.01" value="0" />
-
-      <label for="meal-input">Meal (₱)</label>
-      <input type="number" id="meal-input" min="0" step="0.01" value="0" />
-
-      <div id="dynamic-expenses-container"></div>
-      <button type="button" id="add-expense-btn">Add Other Expense</button>
-
-      <button type="button" id="submit-btn">Submit & Calculate</button>
-    </form>
-
-    <div class="summary">
-      <div>Allowance: ₱<span id="summary-allowance">0.00</span></div>
-      <div>Total Expenses: ₱<span id="summary-expenses">0.00</span></div>
-      <div>Remaining Balance: ₱<span id="summary-remaining">0.00</span></div>
-      <div>Target Saving (10%): ₱<span id="summary-target-saving">0.00</span></div>
-      <div>Actual Saving: ₱<span id="summary-actual-saving">0.00</span></div>
+  <div class="card flex-row" style="margin-top: 1rem;">
+    <div class="card" style="flex:1; min-width: 150px;">
+      <label for="allowance-input">Allowance (₱)</label>
+      <input type="number" id="allowance-input" min="0" step="0.01" value="0" />
     </div>
+    <div class="card" style="flex:1; min-width: 150px;">
+      <label for="transport-input">Fixed Transportation (₱)</label>
+      <input type="number" id="transport-input" min="0" step="0.01" value="0" />
+    </div>
+    <div class="card" style="flex:1; min-width: 150px;">
+      <label for="meal-input">Fixed Meal/Snacks (₱)</label>
+      <input type="number" id="meal-input" min="0" step="0.01" value="0" />
+    </div>
+  </div>
 
-    <div id="calc-message" class="message"></div>
-    <div id="praise-message" class="message"></div>
+  <div class="card" style="margin-top: 1rem;">
+    <h3>Other Expenses</h3>
+    <div id="other-expenses-container"></div>
+    <button id="add-expense-btn" type="button" style="margin-top: 0.5rem;">+ Add Expense Item</button>
+  </div>
 
-    <div class="filters">
-      <label for="filter-month">Filter Month</label>
-      <select id="filter-month">
+  <button id="submit-btn" style="margin-top: 1rem;">Calculate & Submit</button>
+
+  <div id="calc-message" class="message" style="margin-top: 1rem;"></div>
+
+  <div class="card wide" style="margin-top: 1rem;">
+    <h3>Today's Summary</h3>
+    <p>Allowance: ₱<span id="summary-allowance">0.00</span></p>
+    <p>Total Expenses: ₱<span id="summary-total-expenses">0.00</span></p>
+    <p>Remaining Balance: ₱<span id="summary-remaining">0.00</span></p>
+    <p>Target Saving (10% Allowance): ₱<span id="summary-target-saving">0.00</span></p>
+    <p>Actual Savings: ₱<span id="summary-actual-saving">0.00</span></p>
+    <p id="praise-message" class="message"></p>
+  </div>
+
+  <div class="card wide" style="margin-top: 1rem;">
+    <h3>History</h3>
+    <div class="flex-row" style="align-items: center; margin-bottom: 0.5rem;">
+      <label for="filter-month">Filter by Month:</label>
+      <select id="filter-month" style="margin-left: 0.5rem;">
         <option value="all">All Months</option>
         <option value="1">January</option>
         <option value="2">February</option>
@@ -260,158 +241,177 @@
         <option value="11">November</option>
         <option value="12">December</option>
       </select>
-
-      <label for="filter-year">Filter Year</label>
-      <select id="filter-year">
+      <label for="filter-year" style="margin-left: 1rem;">Filter by Year:</label>
+      <select id="filter-year" style="margin-left: 0.5rem;">
         <option value="all">All Years</option>
       </select>
     </div>
-
     <table>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Allowance</th>
-          <th>Transport</th>
-          <th>Meal</th>
-          <th>Other Expenses</th>
-          <th>Total Expenses</th>
-          <th>Remaining</th>
-          <th>Actual Saving</th>
+          <th>Date (MM/DD/YYYY)</th>
+          <th>Allowance (₱)</th>
+          <th>Transport (₱)</th>
+          <th>Meal (₱)</th>
+          <th>Other Expenses (₱)</th>
+          <th>Total Expenses (₱)</th>
+          <th>Remaining Balance (₱)</th>
+          <th>Actual Savings (₱)</th>
         </tr>
       </thead>
       <tbody id="history-table-body">
-        <tr><td colspan="8">No data yet.</td></tr>
+        <tr><td colspan="8">Please login to view history.</td></tr>
       </tbody>
     </table>
-  </section>
+  </div>
+</section>
 
 </main>
 
 <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    onAuthStateChanged, signOut, sendPasswordResetEmail, updateProfile
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import {
+    getDatabase, ref, set, get, child
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-<script>
-  // Your Firebase config - replace with your actual config
+  // Your Firebase config here - REPLACE with your own config
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DB_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAc8HGycdVUdQ_zR9qLu2c-j3bSCkPJj5M",
+    authDomain: "budgetbuddy-b0b79.firebaseapp.com",
+    databaseURL: "https://budgetbuddy-b0b79-default-rtdb.firebaseio.com",
+    projectId: "budgetbuddy-b0b79",
+    storageBucket: "budgetbuddy-b0b79.appspot.com",
+    messagingSenderId: "1035837798232",
+    appId: "1:1035837798232:web:91144e16986d870bb4572d"
   };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
 
-  // Elements
-  const loginSection = document.getElementById("login-section");
-  const signupSection = document.getElementById("signup-section");
-  const trackerSection = document.getElementById("tracker-section");
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  // DOM Elements
+  const loginView = document.getElementById("login-view");
+  const signupView = document.getElementById("signup-view");
+  const trackerView = document.getElementById("tracker-view");
 
   const loginForm = document.getElementById("login-form");
-  const signupForm = document.getElementById("signup-form");
-  const trackerForm = document.getElementById("tracker-form");
-
   const loginEmail = document.getElementById("login-email");
   const loginPassword = document.getElementById("login-password");
+  const forgotPasswordBtn = document.getElementById("forgot-password-btn");
+  const goSignupBtn = document.getElementById("go-signup-btn");
 
+  const signupForm = document.getElementById("signup-form");
   const signupNickname = document.getElementById("signup-nickname");
   const signupEmail = document.getElementById("signup-email");
   const signupPassword = document.getElementById("signup-password");
-
-  const goSignupBtn = document.getElementById("go-signup-btn");
   const goLoginBtn = document.getElementById("go-login-btn");
-  const forgotPasswordBtn = document.getElementById("forgot-password-btn");
 
   const logoutBtn = document.getElementById("logout-btn");
-
   const welcomeNickname = document.getElementById("welcome-nickname");
 
   const datePicker = document.getElementById("date-picker");
   const allowanceInput = document.getElementById("allowance-input");
   const transportInput = document.getElementById("transport-input");
   const mealInput = document.getElementById("meal-input");
-  const dynamicExpensesContainer = document.getElementById("dynamic-expenses-container");
+
+  const otherExpensesContainer = document.getElementById("other-expenses-container");
   const addExpenseBtn = document.getElementById("add-expense-btn");
   const submitBtn = document.getElementById("submit-btn");
 
+  const calcMessage = document.getElementById("calc-message");
+
   const summaryAllowance = document.getElementById("summary-allowance");
-  const summaryExpenses = document.getElementById("summary-expenses");
+  const summaryTotalExpenses = document.getElementById("summary-total-expenses");
   const summaryRemaining = document.getElementById("summary-remaining");
   const summaryTargetSaving = document.getElementById("summary-target-saving");
   const summaryActualSaving = document.getElementById("summary-actual-saving");
-
-  const calcMessage = document.getElementById("calc-message");
   const praiseMessage = document.getElementById("praise-message");
 
   const filterMonth = document.getElementById("filter-month");
   const filterYear = document.getElementById("filter-year");
   const historyTableBody = document.getElementById("history-table-body");
 
-  // Show/hide sections
-  function showLogin() {
-    loginSection.classList.remove("hidden");
-    signupSection.classList.add("hidden");
-    trackerSection.classList.add("hidden");
-    clearMessages();
-  }
-  function showSignup() {
-    loginSection.classList.add("hidden");
-    signupSection.classList.remove("hidden");
-    trackerSection.classList.add("hidden");
-    clearMessages();
-  }
-  function showTracker() {
-    loginSection.classList.add("hidden");
-    signupSection.classList.add("hidden");
-    trackerSection.classList.remove("hidden");
-    clearMessages();
-  }
-  function clearMessages() {
-    calcMessage.textContent = "";
-    praiseMessage.textContent = "";
+  // Praise & Cheer messages
+  const praiseMessages = [
+    "Awesome job! You nailed your savings goal!",
+    "Keep it up! You're a budgeting superstar!",
+    "Fantastic! Saving like a pro!",
+    "Great work! Your future self will thank you!",
+    "Excellent! You're mastering smart money management!"
+  ];
+
+  const cheerMessages = [
+    "Don't give up! Every peso counts!",
+    "Keep trying! Saving is a journey!",
+    "You got this! Small steps lead to big savings!",
+    "Stay motivated! Tomorrow is a new chance!",
+    "Keep pushing! Budgeting gets easier with practice!"
+  ];
+
+  // Utility to format date as MM/DD/YYYY
+  function formatDate(date) {
+    const mm = (date.getMonth() + 1).toString().padStart(2, "0");
+    const dd = date.getDate().toString().padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
   }
 
-  // Default date to today PH timezone
-  function setDefaultDateToTodayPH() {
+  // Set date picker default to today's date (Philippines timezone)
+  function setDatePickerToTodayPH() {
     const now = new Date();
-    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-    const phDate = new Date(utc + 8 * 3600000);
-    datePicker.value = phDate.toISOString().slice(0, 10);
+    // Philippines is UTC+8, adjust if you want exact local time
+    const phOffset = 8 * 60; // in minutes
+    const localOffset = now.getTimezoneOffset();
+    const phTime = new Date(now.getTime() + (localOffset + phOffset) * 60000);
+    const yyyy = phTime.getFullYear();
+    const mm = (phTime.getMonth() + 1).toString().padStart(2, "0");
+    const dd = phTime.getDate().toString().padStart(2, "0");
+    datePicker.value = `${yyyy}-${mm}-${dd}`;
   }
 
-  // Clear inputs on tracker form
-  function clearTrackerInputs() {
-    allowanceInput.value = "";
+  // Show only one view
+  function showView(view) {
+    loginView.classList.add("hidden");
+    signupView.classList.add("hidden");
+    trackerView.classList.add("hidden");
+    view.classList.remove("hidden");
+  }
+
+  // Clear expense inputs
+  function clearExpenseInputs() {
+    allowanceInput.value = "0";
     transportInput.value = "0";
     mealInput.value = "0";
-    dynamicExpensesContainer.innerHTML = "";
+    otherExpensesContainer.innerHTML = "";
+    setDatePickerToTodayPH();
+    calcMessage.textContent = "";
     summaryAllowance.textContent = "0.00";
-    summaryExpenses.textContent = "0.00";
+    summaryTotalExpenses.textContent = "0.00";
     summaryRemaining.textContent = "0.00";
     summaryTargetSaving.textContent = "0.00";
     summaryActualSaving.textContent = "0.00";
     praiseMessage.textContent = "";
-    calcMessage.textContent = "";
-    filterMonth.value = "all";
-    filterYear.value = "all";
   }
 
-  // Add a dynamic expense input row
-  function addDynamicExpenseItem(name = "", amount = "") {
+  // Add dynamic expense input row
+  function addExpenseItem(name = "", amount = "") {
     const div = document.createElement("div");
-    div.className = "dynamic-expense";
+    div.className = "dynamic-expense flex-row";
+    div.style.marginBottom = "0.5rem";
+    div.style.gap = "0.5rem";
 
     const nameInput = document.createElement("input");
     nameInput.type = "text";
-    nameInput.placeholder = "Expense name";
+    nameInput.placeholder = "Item name";
     nameInput.value = name;
     nameInput.required = true;
+    nameInput.style.flex = "2";
 
     const amountInput = document.createElement("input");
     amountInput.type = "number";
@@ -420,267 +420,279 @@
     amountInput.placeholder = "Amount (₱)";
     amountInput.value = amount;
     amountInput.required = true;
+    amountInput.style.flex = "1";
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.textContent = "Remove";
-    removeBtn.className = "remove-expense-btn";
-    removeBtn.onclick = () => div.remove();
+    removeBtn.style.flex = "0 0 auto";
+    removeBtn.style.backgroundColor = "#cc0000";
+    removeBtn.style.color = "white";
+    removeBtn.style.border = "none";
+    removeBtn.style.borderRadius = "3px";
+    removeBtn.style.cursor = "pointer";
+
+    removeBtn.addEventListener("click", () => {
+      otherExpensesContainer.removeChild(div);
+    });
 
     div.appendChild(nameInput);
     div.appendChild(amountInput);
     div.appendChild(removeBtn);
 
-    dynamicExpensesContainer.appendChild(div);
+    otherExpensesContainer.appendChild(div);
   }
 
-  // Calculate and save data
-  async function handleCalculateAndSubmit() {
-    clearMessages();
-
-    const allowance = parseFloat(allowanceInput.value);
-    if (isNaN(allowance) || allowance < 0) {
-      calcMessage.textContent = "Please enter a valid allowance.";
-      return;
-    }
-
+  // Calculate total expenses and update summary, returns total expenses & remaining
+  function calculateAndShowSummary() {
+    const allowance = parseFloat(allowanceInput.value) || 0;
     const transport = parseFloat(transportInput.value) || 0;
     const meal = parseFloat(mealInput.value) || 0;
 
-    // Validate other expenses
-    const otherExpensesDivs = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
+    // Validate non-negative
+    if (allowance < 0 || transport < 0 || meal < 0) {
+      calcMessage.textContent = "Allowance and fixed expenses must be non-negative.";
+      calcMessage.className = "message cheer";
+      return null;
+    }
+
+    // Sum dynamic expenses
     let otherExpensesTotal = 0;
-    const otherExpensesList = [];
-    for (const div of otherExpensesDivs) {
-      const inputs = div.querySelectorAll("input");
-      const name = inputs[0].value.trim();
-      const amount = parseFloat(inputs[1].value);
-      if (!name) {
-        calcMessage.textContent = "Please fill all other expense names.";
-        return;
+    const otherItems = [];
+    const children = otherExpensesContainer.children;
+    for (let i = 0; i < children.length; i++) {
+      const inputs = children[i].getElementsByTagName("input");
+      const itemName = inputs[0].value.trim();
+      const itemAmount = parseFloat(inputs[1].value);
+
+      if (!itemName) {
+        calcMessage.textContent = "Please enter a name for all other expense items.";
+        calcMessage.className = "message cheer";
+        return null;
       }
-      if (isNaN(amount) || amount < 0) {
-        calcMessage.textContent = "Please enter valid amounts for other expenses.";
-        return;
+      if (isNaN(itemAmount) || itemAmount < 0) {
+        calcMessage.textContent = "Other expense amounts must be non-negative numbers.";
+        calcMessage.className = "message cheer";
+        return null;
       }
-      otherExpensesList.push({ name, amount });
-      otherExpensesTotal += amount;
+      otherExpensesTotal += itemAmount;
+      otherItems.push({ name: itemName, amount: itemAmount });
     }
 
     const totalExpenses = transport + meal + otherExpensesTotal;
     const remaining = allowance - totalExpenses;
-    if (remaining < 0) {
-      calcMessage.textContent = "Warning: Your expenses exceed your allowance!";
-    }
-
     const targetSaving = allowance * 0.10;
     const actualSaving = remaining > 0 ? remaining : 0;
 
+    // Update summary UI
     summaryAllowance.textContent = allowance.toFixed(2);
-    summaryExpenses.textContent = totalExpenses.toFixed(2);
+    summaryTotalExpenses.textContent = totalExpenses.toFixed(2);
     summaryRemaining.textContent = remaining.toFixed(2);
     summaryTargetSaving.textContent = targetSaving.toFixed(2);
     summaryActualSaving.textContent = actualSaving.toFixed(2);
 
-    const praiseMessages = [
-      "Great job! You're hitting your savings target!",
-      "Awesome! Keep up the smart spending!",
-      "You're managing your money wisely!",
-      "Fantastic! You're on track with your savings!",
-      "Keep it up! Saving smartly is the key!"
-    ];
-    const cheerMessages = [
-      "Don't worry, every penny counts! Try again tomorrow!",
-      "Keep pushing! You can achieve your savings target!",
-      "Stay positive! Smart money habits take time!",
-      "You're learning and growing! Keep going!",
-      "Every effort counts! Don't give up!"
-    ];
-
+    // Praise or cheer message
     if (actualSaving >= targetSaving) {
-      const msg = praiseMessages[Math.floor(Math.random() * praiseMessages.length)];
-      praiseMessage.textContent = msg;
+      praiseMessage.textContent = praiseMessages[Math.floor(Math.random() * praiseMessages.length)];
       praiseMessage.className = "message success";
     } else {
-      const msg = cheerMessages[Math.floor(Math.random() * cheerMessages.length)];
-      praiseMessage.textContent = msg;
+      praiseMessage.textContent = cheerMessages[Math.floor(Math.random() * cheerMessages.length)];
       praiseMessage.className = "message cheer";
     }
 
-    // Save to Firebase
-    const user = auth.currentUser;
-    if (!user) {
-      calcMessage.textContent = "User not authenticated. Please login again.";
-      return;
-    }
-    const date = datePicker.value;
-    if (!date) {
-      calcMessage.textContent = "Please select a date.";
-      return;
-    }
-
-    const dataToSave = {
-      date,
+    return {
       allowance,
       transport,
       meal,
-      otherExpenses: otherExpensesList,
+      otherItems,
       totalExpenses,
       remaining,
       targetSaving,
-      actualSaving,
-      timestamp: Date.now()
+      actualSaving
     };
+  }
 
+  // Save expense data to Firebase DB
+  async function saveExpenseData(userId, dateKey, data, nickname) {
     try {
-      await db.ref(`users/${user.uid}/expenses/${date}`).set(dataToSave);
-      calcMessage.textContent = "Data saved successfully!";
-      loadHistory();
+      // Save under /users/{userId}/history/{dateKey}
+      const historyRef = ref(db, `users/${userId}/history/${dateKey}`);
+      await set(historyRef, data);
+
+      // Also save nickname under /users/{userId}/profile
+      const profileRef = ref(db, `users/${userId}/profile`);
+      await set(profileRef, { nickname });
+
+      calcMessage.textContent = "Expense data saved successfully!";
+      calcMessage.className = "message success";
     } catch (error) {
-      calcMessage.textContent = "Error saving data: " + error.message;
+      calcMessage.textContent = "Failed to save expense: " + error.message;
+      calcMessage.className = "message cheer";
     }
   }
 
-  // Load history from Firebase
-  async function loadHistory() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const snapshot = await db.ref(`users/${user.uid}/expenses`).once("value");
-    const data = snapshot.val() || {};
-
-    // Build a list of years for filterYear dropdown dynamically
-    const yearsSet = new Set();
-    Object.keys(data).forEach(dateStr => {
-      const year = new Date(dateStr).getFullYear();
-      yearsSet.add(year);
-    });
-
-    // Clear filterYear options except "All Years"
-    while (filterYear.options.length > 1) filterYear.remove(1);
-    Array.from(yearsSet).sort().forEach(year => {
-      const option = document.createElement("option");
-      option.value = year;
-      option.textContent = year;
-      filterYear.appendChild(option);
-    });
-
-    renderHistory(data);
+  // Load user nickname from profile
+  async function loadUserNickname(userId) {
+    try {
+      const profileRef = ref(db, `users/${userId}/profile`);
+      const snapshot = await get(profileRef);
+      if (snapshot.exists()) {
+        return snapshot.val().nickname || "Student";
+      }
+      return "Student";
+    } catch {
+      return "Student";
+    }
   }
 
-  // Render history table with filters
-  function renderHistory(data) {
-    const monthFilter = filterMonth.value;
-    const yearFilter = filterYear.value;
+  // Load expense history for user and update history table
+  async function loadExpenseHistory(userId) {
+    try {
+      const historyRef = ref(db, `users/${userId}/history`);
+      const snapshot = await get(historyRef);
+      if (!snapshot.exists()) {
+        historyTableBody.innerHTML = `<tr><td colspan="8">No expense history found.</td></tr>`;
+        filterYear.innerHTML = '<option value="all">All Years</option>';
+        return;
+      }
+      const data = snapshot.val();
 
-    const dates = Object.keys(data).sort((a,b) => new Date(b) - new Date(a));
-    const filteredDates = dates.filter(dateStr => {
-      const d = new Date(dateStr);
-      if (monthFilter !== "all" && (d.getMonth() + 1).toString() !== monthFilter) return false;
-      if (yearFilter !== "all" && d.getFullYear().toString() !== yearFilter) return false;
-      return true;
+      // Collect all years for filter
+      const yearsSet = new Set();
+      const entries = [];
+
+      for (const dateKey in data) {
+        // dateKey format: yyyy-mm-dd
+        const parts = dateKey.split("-");
+        if (parts.length !== 3) continue;
+        const year = parts[0];
+        const month = parts[1];
+        const day = parts[2];
+
+        yearsSet.add(year);
+
+        const item = data[dateKey];
+        entries.push({
+          dateKey,
+          dateObj: new Date(`${year}-${month}-${day}`),
+          year,
+          month: parseInt(month, 10),
+          allowance: item.allowance || 0,
+          transport: item.transport || 0,
+          meal: item.meal || 0,
+          otherItems: item.otherItems || [],
+          totalExpenses: item.totalExpenses || 0,
+          remaining: item.remaining || 0,
+          targetSaving: item.targetSaving || 0,
+          actualSaving: item.actualSaving || 0
+        });
+      }
+
+      // Sort entries by date descending
+      entries.sort((a, b) => b.dateObj - a.dateObj);
+
+      // Populate year filter options
+      filterYear.innerHTML = '<option value="all">All Years</option>';
+      Array.from(yearsSet).sort((a, b) => b - a).forEach(y => {
+        filterYear.innerHTML += `<option value="${y}">${y}</option>`;
+      });
+
+      // Populate month filter options
+      filterMonth.innerHTML = '<option value="all">All Months</option>';
+      for (let m = 1; m <= 12; m++) {
+        filterMonth.innerHTML += `<option value="${m}">${m}</option>`;
+      }
+
+      // Store entries globally for filtering
+      window.expenseEntries = entries;
+
+      // Show all entries initially
+      filterAndShowHistory();
+
+    } catch (error) {
+      historyTableBody.innerHTML = `<tr><td colspan="8">Error loading history: ${error.message}</td></tr>`;
+    }
+  }
+
+  // Filter history entries by month and year
+  function filterAndShowHistory() {
+    if (!window.expenseEntries) return;
+
+    const selectedYear = filterYear.value;
+    const selectedMonth = filterMonth.value;
+
+    const filtered = window.expenseEntries.filter(entry => {
+      const yearMatch = selectedYear === "all" || entry.year === selectedYear;
+      const monthMatch = selectedMonth === "all" || entry.month === parseInt(selectedMonth, 10);
+      return yearMatch && monthMatch;
     });
 
-    if (filteredDates.length === 0) {
-      historyTableBody.innerHTML = '<tr><td colspan="8">No data to show.</td></tr>';
+    if (filtered.length === 0) {
+      historyTableBody.innerHTML = `<tr><td colspan="8">No records match the filter.</td></tr>`;
       return;
     }
 
     historyTableBody.innerHTML = "";
 
-    filteredDates.forEach(dateStr => {
-      const record = data[dateStr];
-      const otherExpensesDesc = record.otherExpenses.map(o => `${o.name}: ₱${o.amount.toFixed(2)}`).join(", ");
+    filtered.forEach(entry => {
+      const otherItemsText = entry.otherItems.map(i => `${i.name}: ₱${i.amount.toFixed(2)}`).join(", ");
 
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${dateStr}</td>
-        <td>₱${record.allowance.toFixed(2)}</td>
-        <td>₱${record.transport.toFixed(2)}</td>
-        <td>₱${record.meal.toFixed(2)}</td>
-        <td>${otherExpensesDesc || "-"}</td>
-        <td>₱${record.totalExpenses.toFixed(2)}</td>
-        <td>₱${record.remaining.toFixed(2)}</td>
-        <td>₱${record.actualSaving.toFixed(2)}</td>
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${entry.dateKey}</td>
+        <td>₱${entry.allowance.toFixed(2)}</td>
+        <td>₱${entry.transport.toFixed(2)}</td>
+        <td>₱${entry.meal.toFixed(2)}</td>
+        <td>${otherItemsText}</td>
+        <td>₱${entry.totalExpenses.toFixed(2)}</td>
+        <td>₱${entry.remaining.toFixed(2)}</td>
+        <td>₱${entry.actualSaving.toFixed(2)}</td>
       `;
-
-      historyTableBody.appendChild(tr);
+      historyTableBody.appendChild(row);
     });
   }
 
-  // Authentication handlers
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      await auth.signInWithEmailAndPassword(loginEmail.value, loginPassword.value);
-    } catch (err) {
-      alert("Login failed: " + err.message);
-    }
-  });
+  // On page load
+  window.addEventListener("DOMContentLoaded", () => {
+    setDatePickerToTodayPH();
 
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      const userCred = await auth.createUserWithEmailAndPassword(signupEmail.value, signupPassword.value);
-      await userCred.user.updateProfile({ displayName: signupNickname.value });
-      alert("Account created! Please log in.");
-      showLogin();
-    } catch (err) {
-      alert("Signup failed: " + err.message);
-    }
-  });
-
-  forgotPasswordBtn.addEventListener("click", async () => {
-    const email = prompt("Please enter your email for password reset:");
-    if (email) {
-      try {
-        await auth.sendPasswordResetEmail(email);
-        alert("Password reset email sent.");
-      } catch (err) {
-        alert("Error sending reset email: " + err.message);
+    // Attach event listeners
+    addExpenseBtn.addEventListener("click", () => addExpenseItem());
+    submitBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        calcMessage.textContent = "You must be logged in to save expenses.";
+        calcMessage.className = "message cheer";
+        return;
       }
-    }
+
+      const data = calculateAndShowSummary();
+      if (!data) return;
+
+      const nickname = await loadUserNickname(user.uid);
+      const dateKey = datePicker.value;
+
+      await saveExpenseData(user.uid, dateKey, data, nickname);
+
+      clearExpenseInputs();
+      loadExpenseHistory(user.uid);
+    });
+
+    filterMonth.addEventListener("change", filterAndShowHistory);
+    filterYear.addEventListener("change", filterAndShowHistory);
+
+    // Firebase auth listener
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        showView(trackerView);
+        clearExpenseInputs();
+        loadExpenseHistory(user.uid);
+      } else {
+        showView(loginView);
+      }
+    });
   });
 
-  goSignupBtn.addEventListener("click", () => showSignup());
-  goLoginBtn.addEventListener("click", () => showLogin());
-
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut();
-  });
-
-  addExpenseBtn.addEventListener("click", () => addDynamicExpenseItem());
-
-  submitBtn.addEventListener("click", () => handleCalculateAndSubmit());
-
-  filterMonth.addEventListener("change", async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-    const snapshot = await db.ref(`users/${user.uid}/expenses`).once("value");
-    renderHistory(snapshot.val() || {});
-  });
-
-  filterYear.addEventListener("change", async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-    const snapshot = await db.ref(`users/${user.uid}/expenses`).once("value");
-    renderHistory(snapshot.val() || {});
-  });
-
-  // On auth state change
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      showTracker();
-      welcomeNickname.textContent = user.displayName || "Student";
-      setDefaultDateToTodayPH();
-      clearTrackerInputs();
-      await loadHistory();
-    } else {
-      showLogin();
-    }
-  });
 </script>
-
 </body>
 </html>
