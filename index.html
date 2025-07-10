@@ -294,515 +294,374 @@ Filter by:
 
 <!-- Firebase SDKs -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
-// Your Firebase config (replace with your own!)
-const firebaseConfig = {
-apiKey: "AIzaSyAc8HGycdVUdQ_zR9qLu2c-j3bSCkPJj5M",
-authDomain: "budgetbuddy-b0b79.firebaseapp.com",
-databaseURL: "https://budgetbuddy-b0b79-default-rtdb.firebaseio.com",
-projectId: "budgetbuddy-b0b79",
-storageBucket: "budgetbuddy-b0b79.appspot.com",
-messagingSenderId: "1035837798232",
-appId: "1:1035837798232:web:91144e16986d870bb4572d"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
-
-// --- UI Elements ---
-const loginForm = document.getElementById("loginForm");
-const signupForm = document.getElementById("signupForm");
-const forgotForm = document.getElementById("forgotForm");
-const trackerPage = document.getElementById("trackerPage");
-
-const loginEmail = document.getElementById("loginEmail");
-const loginPassword = document.getElementById("loginPassword");
-const loginBtn = document.getElementById("loginBtn");
-const loginError = document.getElementById("loginError");
-
-const signupNickname = document.getElementById("signupNickname");
-const signupEmail = document.getElementById("signupEmail");
-const signupPassword = document.getElementById("signupPassword");
-const signupBtn = document.getElementById("signupBtn");
-const signupError = document.getElementById("signupError");
-
-const forgotEmail = document.getElementById("forgotEmail");
-const forgotSendBtn = document.getElementById("forgotSendBtn");
-const forgotMessage = document.getElementById("forgotMessage");
-const forgotError = document.getElementById("forgotError");
-
-const showSignupLink = document.getElementById("showSignupLink");
-const showLoginLink = document.getElementById("showLoginLink");
-const showForgotLink = document.getElementById("showForgotLink");
-const showLoginFromForgot = document.getElementById("showLoginFromForgot");
-
-const nicknameDisplay = document.getElementById("nicknameDisplay");
-const logoutBtn = document.getElementById("logoutBtn");
-
-const datePicker = document.getElementById("datePicker");
-const allowanceInput = document.getElementById("allowanceInput");
-const transportInput = document.getElementById("transportInput");
-const mealInput = document.getElementById("mealInput");
-const dynamicExpensesContainer = document.getElementById("dynamicExpensesContainer");
-const addExpenseBtn = document.getElementById("addExpenseBtn");
-
-const calculateBtn = document.getElementById("calculateBtn");
-const submitBtn = document.getElementById("submitBtn");
-
-const summaryAllowance = document.getElementById("summaryAllowance");
-const summaryExpenses = document.getElementById("summaryExpenses");
-const summaryRemaining = document.getElementById("summaryRemaining");
-const summaryTargetSaving = document.getElementById("summaryTargetSaving");
-const summaryActualSaving = document.getElementById("summaryActualSaving");
-
-const praiseMessage = document.getElementById("praiseMessage");
-const calcMessage = document.getElementById("calcMessage");
-
-const filterMonth = document.getElementById("filterMonth");
-const filterYear = document.getElementById("filterYear");
-const historyTableBody = document.getElementById("historyTableBody");
-
-// --- Show/hide forms ---
-function showLogin() {
-loginForm.style.display = "block";
-signupForm.style.display = "none";
-forgotForm.style.display = "none";
-trackerPage.style.display = "none";
-clearMessages();
-}
-function showSignup() {
-loginForm.style.display = "none";
-signupForm.style.display = "block";
-forgotForm.style.display = "none";
-trackerPage.style.display = "none";
-clearMessages();
-}
-function showForgot() {
-loginForm.style.display = "none";
-signupForm.style.display = "none";
-forgotForm.style.display = "block";
-trackerPage.style.display = "none";
-clearMessages();
-}
-function showTracker() {
-loginForm.style.display = "none";
-signupForm.style.display = "none";
-forgotForm.style.display = "none";
-trackerPage.style.display = "block";
-clearMessages();
-}
-
-// Clear messages helper
-function clearMessages() {
-loginError.textContent = "";
-signupError.textContent = "";
-forgotMessage.textContent = "";
-forgotError.textContent = "";
-calcMessage.textContent = "";
-praiseMessage.textContent = "";
-}
-
-// --- Signup ---
-signupBtn.addEventListener("click", async () => {
-clearMessages();
-const nickname = signupNickname.value.trim();
-const email = signupEmail.value.trim();
-const password = signupPassword.value;
-
-if (!nickname) {
-signupError.textContent = "Please enter your nickname.";
-return;
-}
-if (!email) {
-signupError.textContent = "Please enter your email.";
-return;
-}
-if (!password || password.length < 6) {
-signupError.textContent = "Password must be at least 6 characters.";
-return;
-}
-
-try {
-const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-const user = userCredential.user;
-
-// Save nickname to Realtime DB under users node
-await set(ref(db, "users/" + user.uid), {
-nickname: nickname,
-email: email
-});
-
-// Update user profile displayName (optional)
-await updateProfile(user, { displayName: nickname });
-
-signupError.textContent = "";
-showTracker();
-nicknameDisplay.textContent = nickname;
-loadHistory();
-} catch (error) {
-signupError.textContent = error.message;
-}
-});
-
-// --- Login ---
-loginBtn.addEventListener("click", async () => {
-clearMessages();
-const email = loginEmail.value.trim();
-const password = loginPassword.value;
-
-if (!email) {
-loginError.textContent = "Please enter your email.";
-return;
-}
-if (!password) {
-loginError.textContent = "Please enter your password.";
-return;
-}
-
-try {
-const userCredential = await signInWithEmailAndPassword(auth, email, password);
-const user = userCredential.user;
-// Get nickname from DB
-const snapshot = await get(ref(db, "users/" + user.uid));
-const userData = snapshot.val();
-showTracker();
-nicknameDisplay.textContent = userData?.nickname || user.email;
-loadHistory();
-} catch (error) {
-loginError.textContent = error.message;
-}
-});
-
-// --- Logout ---
-logoutBtn.addEventListener("click", async () => {
-await signOut(auth);
-showLogin();
-clearTrackerInputs();
-});
-
-// --- Forgot Password ---
-forgotSendBtn.addEventListener("click", async () => {
-forgotMessage.textContent = "";
-forgotError.textContent = "";
-const email = forgotEmail.value.trim();
-if (!email) {
-forgotError.textContent = "Please enter your email.";
-return;
-}
-try {
-await sendPasswordResetEmail(auth, email);
-forgotMessage.textContent = "Password reset email sent! Check your inbox.";
-} catch (error) {
-forgotError.textContent = error.message;
-}
-});
-
-// --- Switch Forms ---
-showSignupLink.addEventListener("click", showSignup);
-showLoginLink.addEventListener("click", showLogin);
-showForgotLink.addEventListener("click", showForgot);
-showLoginFromForgot.addEventListener("click", showLogin);
-
-// --- Date Picker default to today (Philippines time) ---
-function setDefaultDateToTodayPH() {
-const now = new Date();
-// Philippines is UTC+8
-const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-const philippinesTime = new Date(utc + (3600000 * 8));
-datePicker.value = philippinesTime.toISOString().split("T")[0];
-}
-setDefaultDateToTodayPH();
-
-// --- Dynamic Other Expenses ---
-function createDynamicExpenseRow() {
-const div = document.createElement("div");
-div.classList.add("dynamic-expense");
-
-const descInput = document.createElement("input");
-descInput.type = "text";
-descInput.placeholder = "Description";
-descInput.required = true;
-
-const amountInput = document.createElement("input");
-amountInput.type = "number";
-amountInput.min = "0";
-amountInput.step = "0.01";
-amountInput.placeholder = "Amount";
-amountInput.required = true;
-
-const removeBtn = document.createElement("button");
-removeBtn.textContent = "×";
-removeBtn.title = "Remove";
-removeBtn.addEventListener("click", () => div.remove());
-
-div.appendChild(descInput);
-div.appendChild(amountInput);
-div.appendChild(removeBtn);
-
-return div;
-}
-addExpenseBtn.addEventListener("click", () => {
-dynamicExpensesContainer.appendChild(createDynamicExpenseRow());
-});
-
-// --- Clear Tracker Inputs ---
-function clearTrackerInputs() {
-allowanceInput.value = "";
-transportInput.value = "0";
-mealInput.value = "0";
-dynamicExpensesContainer.innerHTML = "";
-summaryAllowance.textContent = "0.00";
-summaryExpenses.textContent = "0.00";
-summaryRemaining.textContent = "0.00";
-summaryTargetSaving.textContent = "0.00";
-summaryActualSaving.textContent = "0.00";
-praiseMessage.textContent = "";
-calcMessage.textContent = "";
-setDefaultDateToTodayPH();
-}
-
-// --- Calculate summary ---
-calculateBtn.addEventListener("click", () => {
-calcMessage.textContent = "";
-praiseMessage.textContent = "";
-const allowance = parseFloat(allowanceInput.value);
-const transport = parseFloat(transportInput.value);
-const meal = parseFloat(mealInput.value);
-
-if (isNaN(allowance) || allowance < 0) {
-calcMessage.textContent = "Please enter a valid allowance.";
-return;
-}
-if (isNaN(transport) || transport < 0 || isNaN(meal) || meal < 0) {
-calcMessage.textContent = "Please enter valid fixed expenses.";
-return;
-}
-
-// Sum dynamic other expenses
-let otherExpensesTotal = 0;
-const dynamicRows = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
-for (const row of dynamicRows) {
-const amountInput = row.querySelector("input[type='number']");
-const amount = parseFloat(amountInput.value);
-if (isNaN(amount) || amount < 0) {
-calcMessage.textContent = "Please enter valid amounts for other expenses.";
-return;
-}
-otherExpensesTotal += amount;
-}
-
-const totalExpenses = transport + meal + otherExpensesTotal;
-const remaining = allowance - totalExpenses;
-const targetSaving = allowance * 0.1;
-const actualSaving = Math.max(0, remaining);
-
-summaryAllowance.textContent = allowance.toFixed(2);
-summaryExpenses.textContent = totalExpenses.toFixed(2);
-summaryRemaining.textContent = remaining.toFixed(2);
-summaryTargetSaving.textContent = targetSaving.toFixed(2);
-summaryActualSaving.textContent = actualSaving.toFixed(2);
-
-if (actualSaving >= targetSaving) {
-praiseMessage.textContent = "Congratulations! You saved well today! 🎉";
-praiseMessage.className = "praise-message success";
-} else if (actualSaving > 0) {
-praiseMessage.textContent = "Good effort! Keep trying to save more. 💪";
-praiseMessage.className = "praise-message cheer";
-} else {
-praiseMessage.textContent = "Try to reduce expenses to save money.";
-praiseMessage.className = "praise-message cheer";
-}
-});
-
-// --- Submit data to Firebase Realtime Database ---
-submitBtn.addEventListener("click", async () => {
-calcMessage.textContent = "";
-praiseMessage.textContent = "";
-
-const allowance = parseFloat(allowanceInput.value);
-const transport = parseFloat(transportInput.value);
-const meal = parseFloat(mealInput.value);
-const date = datePicker.value;
-
-if (!date) {
-calcMessage.textContent = "Please select a date.";
-return;
-}
-if (isNaN(allowance) || allowance < 0) {
-calcMessage.textContent = "Please enter a valid allowance.";
-return;
-}
-if (isNaN(transport) || transport < 0 || isNaN(meal) || meal < 0) {
-calcMessage.textContent = "Please enter valid fixed expenses.";
-return;
-}
-
-// Collect other expenses description and amount
-const otherExpenses = [];
-const dynamicRows = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
-for (const row of dynamicRows) {
-const descInput = row.querySelector("input[type='text']");
-const amountInput = row.querySelector("input[type='number']");
-const desc = descInput.value.trim();
-const amount = parseFloat(amountInput.value);
-
-if (!desc) {
-calcMessage.textContent = "Please enter description for other expenses.";
-return;
-}
-if (isNaN(amount) || amount < 0) {
-calcMessage.textContent = "Please enter valid amounts for other expenses.";
-return;
-}
-otherExpenses.push({ description: desc, amount });
-}
-
-const totalOther = otherExpenses.reduce((acc, cur) => acc + cur.amount, 0);
-const totalExpenses = transport + meal + totalOther;
-const remaining = allowance - totalExpenses;
-const actualSaving = Math.max(0, remaining);
-
-// Current user UID
-const user = auth.currentUser;
-if (!user) {
-calcMessage.textContent = "User not authenticated. Please login again.";
-showLogin();
-return;
-}
-
-try {
-// Save expense data under user/expenses/YYYY-MM-DD/randomid
-const expenseData = {
-date,
-allowance,
-transport,
-meal,
-otherExpenses,
-totalExpenses,
-remaining,
-actualSaving,
-timestamp: Date.now()
-};
-
-const expensesRef = ref(db, `expenses/${user.uid}/${date}`);
-await set(expensesRef, expenseData);
-
-calcMessage.textContent = "";
-praiseMessage.textContent = "Expense saved successfully!";
-praiseMessage.className = "praise-message success";
-
-loadHistory();
-clearTrackerInputs();
-setDefaultDateToTodayPH();
-} catch (error) {
-calcMessage.textContent = "Failed to save expense: " + error.message;
-}
-});
-
-// --- Load history data ---
-async function loadHistory() {
-const user = auth.currentUser;
-if (!user) return;
-
-const expensesRef = ref(db, `expenses/${user.uid}`);
-const snapshot = await get(expensesRef);
-const data = snapshot.val();
-
-if (!data) {
-historyTableBody.innerHTML = `<tr><td colspan="8">No data available.</td></tr>`;
-populateYearFilter([]);
-return;
-}
-
-// Flatten data to array
-const expensesArray = [];
-Object.entries(data).forEach(([dateKey, expense]) => {
-expensesArray.push({ date: dateKey, ...expense });
-});
-
-// Populate year filter dropdown with years present in data
-const yearsSet = new Set(expensesArray.map(e => new Date(e.date).getFullYear()));
-populateYearFilter(Array.from(yearsSet).sort());
-
-// Apply filter and render table
-renderHistoryTable(expensesArray);
-}
-
-// Populate year filter dropdown
-function populateYearFilter(years) {
-filterYear.innerHTML = '<option value="all">All Years</option>';
-years.forEach(year => {
-const option = document.createElement("option");
-option.value = year;
-option.textContent = year;
-filterYear.appendChild(option);
-});
-}
-
-// Render history table with current filter
-function renderHistoryTable(dataArray) {
-const monthVal = filterMonth.value;
-const yearVal = filterYear.value;
-
-let filtered = dataArray;
-
-if (monthVal !== "all") {
-filtered = filtered.filter(e => (new Date(e.date).getMonth() + 1) == monthVal);
-}
-if (yearVal !== "all") {
-filtered = filtered.filter(e => (new Date(e.date).getFullYear()) == yearVal);
-}
-
-if (filtered.length === 0) {
-historyTableBody.innerHTML = `<tr><td colspan="8">No data available for selected filter.</td></tr>`;
-return;
-}
-
-filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-let html = "";
-filtered.forEach(e => {
-// Compose other expenses summary string
-let otherDescAmounts = e.otherExpenses?.map(oe => `${oe.description}: ₱${oe.amount.toFixed(2)}`).join(", ") || "-";
-
-html += `<tr>
-<td>${e.date}</td>
-<td>₱${parseFloat(e.allowance).toFixed(2)}</td>
-<td>₱${parseFloat(e.transport).toFixed(2)}</td>
-<td>₱${parseFloat(e.meal).toFixed(2)}</td>
-<td>${otherDescAmounts}</td>
-<td>₱${parseFloat(e.totalExpenses).toFixed(2)}</td>
-<td>₱${parseFloat(e.remaining).toFixed(2)}</td>
-<td>₱${parseFloat(e.actualSaving).toFixed(2)}</td>
-</tr>`;
-});
-
-historyTableBody.innerHTML = html;
-}
-
-// On filter change, reload history with filter
-filterMonth.addEventListener("change", loadHistory);
-filterYear.addEventListener("change", loadHistory);
-
-// --- Check auth state on page load ---
-onAuthStateChanged(auth, async user => {
-if (user) {
-// Get nickname from DB
-const snapshot = await get(ref(db, "users/" + user.uid));
-const userData = snapshot.val();
-showTracker();
-nicknameDisplay.textContent = userData?.nickname || user.email;
-loadHistory();
-} else {
-showLogin();
-clearTrackerInputs();
-}
-});
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    sendPasswordResetEmail,
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    set,
+    get,
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+  // Firebase config and init (replace with your config)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAc8HGycdVUdQ_zR9qLu2c-j3bSCkPJj5M",
+    authDomain: "budgetbuddy-b0b79.firebaseapp.com",
+    databaseURL: "https://budgetbuddy-b0b79-default-rtdb.firebaseio.com",
+    projectId: "budgetbuddy-b0b79",
+    storageBucket: "budgetbuddy-b0b79.appspot.com",
+    messagingSenderId: "1035837798232",
+    appId: "1:1035837798232:web:91144e16986d870bb4572d",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  // DOM elements
+  const loginForm = document.getElementById("login-form");
+  const signupForm = document.getElementById("signup-form");
+  const trackerSection = document.getElementById("tracker-section");
+  const welcomeNickname = document.getElementById("welcome-nickname");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  const datePicker = document.getElementById("date-picker");
+  const allowanceInput = document.getElementById("allowance");
+  const transportInput = document.getElementById("transport");
+  const mealInput = document.getElementById("meal");
+  const dynamicExpensesContainer = document.getElementById("dynamic-expenses");
+
+  const addExpenseBtn = document.getElementById("add-expense-btn");
+  const submitBtn = document.getElementById("submit-btn");
+
+  const summaryAllowance = document.getElementById("summary-allowance");
+  const summaryExpenses = document.getElementById("summary-expenses");
+  const summaryRemaining = document.getElementById("summary-remaining");
+  const summaryTargetSaving = document.getElementById("summary-target-saving");
+  const summaryActualSaving = document.getElementById("summary-actual-saving");
+  const praiseMessage = document.getElementById("praise-message");
+  const calcMessage = document.getElementById("calc-message");
+
+  const historyTableBody = document.getElementById("history-table-body");
+  const filterMonth = document.getElementById("filter-month");
+  const filterYear = document.getElementById("filter-year");
+
+  // Utilities
+  function clearTrackerInputs() {
+    allowanceInput.value = "";
+    transportInput.value = "";
+    mealInput.value = "";
+    dynamicExpensesContainer.innerHTML = "";
+    praiseMessage.textContent = "";
+    calcMessage.textContent = "";
+    summaryAllowance.textContent = "0.00";
+    summaryExpenses.textContent = "0.00";
+    summaryRemaining.textContent = "0.00";
+    summaryTargetSaving.textContent = "0.00";
+    summaryActualSaving.textContent = "0.00";
+  }
+
+  function setDefaultDateToTodayPH() {
+    // Philippine timezone offset +8
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+    datePicker.value = now.toISOString().split("T")[0];
+  }
+
+  // Show/hide views
+  function showLogin() {
+    loginForm.style.display = "block";
+    signupForm.style.display = "none";
+    trackerSection.style.display = "none";
+  }
+  function showSignup() {
+    loginForm.style.display = "none";
+    signupForm.style.display = "block";
+    trackerSection.style.display = "none";
+  }
+  function showTracker() {
+    loginForm.style.display = "none";
+    signupForm.style.display = "none";
+    trackerSection.style.display = "block";
+  }
+
+  // Signup and login form handling (unchanged)
+
+  document.getElementById("signup-link").addEventListener("click", e => {
+    e.preventDefault();
+    showSignup();
+  });
+
+  document.getElementById("login-link").addEventListener("click", e => {
+    e.preventDefault();
+    showLogin();
+  });
+
+  signupForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const nickname = document.getElementById("signup-nickname").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await set(ref(db, "users/" + user.uid), { nickname, email });
+      signupForm.reset();
+      alert("Signup successful. Please login.");
+      showLogin();
+    } catch (error) {
+      alert("Signup error: " + error.message);
+    }
+  });
+
+  loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      loginForm.reset();
+    } catch (error) {
+      alert("Login error: " + error.message);
+    }
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+  });
+
+  // Add dynamic expense row
+  addExpenseBtn.addEventListener("click", () => {
+    const div = document.createElement("div");
+    div.classList.add("dynamic-expense");
+    div.innerHTML = `
+      <input type="text" placeholder="Description" required />
+      <input type="number" min="0" step="0.01" placeholder="Amount" required />
+      <button type="button" class="remove-expense-btn">X</button>
+    `;
+    dynamicExpensesContainer.appendChild(div);
+
+    div.querySelector(".remove-expense-btn").addEventListener("click", () => {
+      dynamicExpensesContainer.removeChild(div);
+    });
+  });
+
+  // Combined calculate & submit function
+  submitBtn.addEventListener("click", async () => {
+    calcMessage.textContent = "";
+    praiseMessage.textContent = "";
+
+    const allowance = parseFloat(allowanceInput.value);
+    const transport = parseFloat(transportInput.value);
+    const meal = parseFloat(mealInput.value);
+    const date = datePicker.value;
+
+    if (!date) {
+      calcMessage.textContent = "Please select a date.";
+      return;
+    }
+    if (isNaN(allowance) || allowance < 0) {
+      calcMessage.textContent = "Please enter a valid allowance.";
+      return;
+    }
+    if (isNaN(transport) || transport < 0) {
+      calcMessage.textContent = "Please enter valid fixed transport expense.";
+      return;
+    }
+    if (isNaN(meal) || meal < 0) {
+      calcMessage.textContent = "Please enter valid fixed meal/snacks expense.";
+      return;
+    }
+
+    // Collect dynamic other expenses
+    let otherExpenses = [];
+    const rows = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
+    for (const row of rows) {
+      const descInput = row.querySelector("input[type='text']");
+      const amtInput = row.querySelector("input[type='number']");
+      const desc = descInput.value.trim();
+      const amt = parseFloat(amtInput.value);
+      if (!desc) {
+        calcMessage.textContent = "Please enter description for all other expenses.";
+        return;
+      }
+      if (isNaN(amt) || amt < 0) {
+        calcMessage.textContent = "Please enter valid amounts for all other expenses.";
+        return;
+      }
+      otherExpenses.push({ description: desc, amount: amt });
+    }
+
+    const totalOther = otherExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalExpenses = transport + meal + totalOther;
+    const remaining = allowance - totalExpenses;
+    const targetSaving = allowance * 0.1;
+    const actualSaving = Math.max(0, remaining);
+
+    // Show summary
+    summaryAllowance.textContent = allowance.toFixed(2);
+    summaryExpenses.textContent = totalExpenses.toFixed(2);
+    summaryRemaining.textContent = remaining.toFixed(2);
+    summaryTargetSaving.textContent = targetSaving.toFixed(2);
+    summaryActualSaving.textContent = actualSaving.toFixed(2);
+
+    // Praise or cheer messages
+    const praiseMsgs = [
+      "Awesome! You're hitting your savings goals! 🎉",
+      "Great job saving today! Keep it up! 💪",
+      "You're doing fantastic managing your money! 🌟",
+      "Savings on point! You're a budget pro! 👏",
+      "Way to go! Your financial habits rock! 🚀",
+    ];
+    const cheerMsgs = [
+      "Don't give up! Every penny counts! 😊",
+      "Keep pushing! Your goals are within reach! 💪",
+      "Stay motivated! You're improving every day! 🌱",
+      "Cheer up! Small steps lead to big savings! ✨",
+      "You got this! Tomorrow is a new chance! 🌞",
+    ];
+
+    if (actualSaving >= targetSaving) {
+      praiseMessage.textContent = praiseMsgs[Math.floor(Math.random() * praiseMsgs.length)];
+      praiseMessage.className = "praise-message success";
+    } else {
+      praiseMessage.textContent = cheerMsgs[Math.floor(Math.random() * cheerMsgs.length)];
+      praiseMessage.className = "praise-message cheer";
+    }
+
+    // Save data to Firebase
+    const user = auth.currentUser;
+    if (!user) {
+      calcMessage.textContent = "User not authenticated. Please login again.";
+      showLogin();
+      return;
+    }
+
+    const expenseData = {
+      date,
+      allowance,
+      transport,
+      meal,
+      otherExpenses,
+      totalExpenses,
+      remaining,
+      actualSaving,
+      timestamp: Date.now(),
+    };
+
+    try {
+      await set(ref(db, `expenses/${user.uid}/${date}`), expenseData);
+      calcMessage.textContent = "";
+      // Refresh history table
+      loadHistory();
+      clearTrackerInputs();
+      setDefaultDateToTodayPH();
+    } catch (error) {
+      calcMessage.textContent = "Failed to save expense: " + error.message;
+    }
+  });
+
+  // Load history (unchanged from before)
+  async function loadHistory() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const expensesRef = ref(db, `expenses/${user.uid}`);
+    const snapshot = await get(expensesRef);
+    const data = snapshot.val();
+
+    if (!data) {
+      historyTableBody.innerHTML = `<tr><td colspan="8">No data available.</td></tr>`;
+      populateYearFilter([]);
+      return;
+    }
+
+    const expensesArray = [];
+    Object.entries(data).forEach(([dateKey, expense]) => {
+      expensesArray.push({ date: dateKey, ...expense });
+    });
+
+    const yearsSet = new Set(expensesArray.map(e => new Date(e.date).getFullYear()));
+    populateYearFilter(Array.from(yearsSet).sort());
+
+    renderHistoryTable(expensesArray);
+  }
+
+  function populateYearFilter(years) {
+    filterYear.innerHTML = '<option value="all">All Years</option>';
+    years.forEach(year => {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      filterYear.appendChild(option);
+    });
+  }
+
+  function renderHistoryTable(dataArray) {
+    const monthVal = filterMonth.value;
+    const yearVal = filterYear.value;
+
+    let filtered = dataArray;
+
+    if (monthVal !== "all") {
+      filtered = filtered.filter(e => (new Date(e.date).getMonth() + 1) == monthVal);
+    }
+    if (yearVal !== "all") {
+      filtered = filtered.filter(e => (new Date(e.date).getFullYear()) == yearVal);
+    }
+
+    if (filtered.length === 0) {
+      historyTableBody.innerHTML = `<tr><td colspan="8">No data available for selected filter.</td></tr>`;
+      return;
+    }
+
+    filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    let html = "";
+    filtered.forEach(e => {
+      let otherDescAmounts = e.otherExpenses?.map(oe => `${oe.description}: ₱${oe.amount.toFixed(2)}`).join(", ") || "-";
+
+      html += `<tr>
+        <td>${e.date}</td>
+        <td>₱${parseFloat(e.allowance).toFixed(2)}</td>
+        <td>₱${parseFloat(e.transport).toFixed(2)}</td>
+        <td>₱${parseFloat(e.meal).toFixed(2)}</td>
+        <td>${otherDescAmounts}</td>
+        <td>₱${parseFloat(e.totalExpenses).toFixed(2)}</td>
+        <td>₱${parseFloat(e.remaining).toFixed(2)}</td>
+        <td>₱${parseFloat(e.actualSaving).toFixed(2)}</td>
+      </tr>`;
+    });
+
+    historyTableBody.innerHTML = html;
+  }
+
+  filterMonth.addEventListener("change", loadHistory);
+  filterYear.addEventListener("change", loadHistory);
+
+  // Auth state listener to toggle views
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      const snapshot = await get(ref(db, "users/" + user.uid));
+      const userData = snapshot.val();
+      welcomeNickname.textContent = userData?.nickname || "Student";
+
+      showTracker();
+      setDefaultDateToTodayPH();
+      loadHistory();
+      clearTrackerInputs();
+    } else {
+      showLogin();
+    }
+  });
 
 </script>
 </body>
