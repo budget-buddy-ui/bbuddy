@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Budget Buddy - Login/Signup</title>
+<style>
+body {
+font-family: sans-serif;
+background: #f2f2f2;
+padding: 2rem;
+}
+.container {
+max-width: 400px;
+margin: auto;
+background: white;
+padding: 2rem;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+h2 {
+text-align: center;
+color: #333;
+}
+input {
+width: 100%;
+padding: 10px;
+margin-top: 10px;
+}
+button {
+width: 100%;
+margin-top: 10px;
+padding: 10px;
+background: #007bff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+.hidden {
+display: none;
+}
+.message {
+text-align: center;
+margin-top: 10px;
+color: green;
+}
+</style>
+</head>
+<body>
+<div id="authSection" class="container">
+<h2>Budget Buddy</h2>
+<h3>Sign Up</h3>
+<input type="text" id="nickname" placeholder="Nickname" />
+<input type="email" id="signupEmail" placeholder="Email" />
+<input type="password" id="signupPassword" placeholder="Password" />
+<button onclick="signUp()">Sign Up</button>
+
+<h3>Login</h3>
+<input type="email" id="loginEmail" placeholder="Email" />
+<input type="password" id="loginPassword" placeholder="Password" />
+<button onclick="login()">Login</button>
+<button onclick="forgotPassword()">Forgot Password</button>
+
+<div id="authMessage" class="message"></div>
+</div>
+
+<div id="trackerSection" class="container hidden">
+<h2>Welcome, <span id="nicknameDisplay"></span>!</h2>
+<button onclick="logout()">Logout</button>
+<p>This is your Budget Buddy Tracker. 🎯</p>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+sendPasswordResetEmail,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+getDatabase,
+ref,
+set,
+get
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAc8HGycdVUdQ_zR9qLu2c-j3bSCkPJj5M",
+authDomain: "budgetbuddy-b0b79.firebaseapp.com",
+projectId: "budgetbuddy-b0b79",
+storageBucket: "budgetbuddy-b0b79.appspot.com",
+messagingSenderId: "1035837798232",
+appId: "1:1035837798232:web:91144e16986d870bb4572d",
+databaseURL: "https://budgetbuddy-b0b79-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// Sign Up
+window.signUp = function () {
+const email = document.getElementById("signupEmail").value;
+const password = document.getElementById("signupPassword").value;
+const nickname = document.getElementById("nickname").value;
+
+if (!nickname || !email || !password) {
+document.getElementById("authMessage").textContent = "Please fill in all fields.";
+return;
+}
+
+createUserWithEmailAndPassword(auth, email, password)
+.then((cred) => {
+return set(ref(db, 'users/' + cred.user.uid), {
+email,
+nickname
+});
+})
+.then(() => {
+document.getElementById("authMessage").textContent = "Signed up successfully!";
+})
+.catch((err) => {
+document.getElementById("authMessage").textContent = err.message;
+});
+};
+
+// Login
+window.login = function () {
+const email = document.getElementById("loginEmail").value;
+const password = document.getElementById("loginPassword").value;
+
+signInWithEmailAndPassword(auth, email, password)
+.then(() => {
+document.getElementById("authMessage").textContent = "Logged in!";
+})
+.catch((err) => {
+document.getElementById("authMessage").textContent = err.message;
+});
+};
+
+// Forgot password
+window.forgotPassword = function () {
+const email = document.getElementById("loginEmail").value;
+if (!email) {
+document.getElementById("authMessage").textContent = "Enter email to reset password.";
+return;
+}
+sendPasswordResetEmail(auth, email)
+.then(() => {
+document.getElementById("authMessage").textContent = "Password reset email sent!";
+})
+.catch((err) => {
+document.getElementById("authMessage").textContent = err.message;
+});
+};
+
+// Logout
+window.logout = function () {
+signOut(auth);
+};
+
+// Auth observer
+onAuthStateChanged(auth, (user) => {
+if (user) {
+// Get nickname
+get(ref(db, "users/" + user.uid)).then((snap) => {
+if (snap.exists()) {
+document.getElementById("nicknameDisplay").textContent = snap.val().nickname;
+}
+});
+document.getElementById("authSection").classList.add("hidden");
+document.getElementById("trackerSection").classList.remove("hidden");
+} else {
+document.getElementById("authSection").classList.remove("hidden");
+document.getElementById("trackerSection").classList.add("hidden");
+}
+});
+</script>
+</body>
+</html>
