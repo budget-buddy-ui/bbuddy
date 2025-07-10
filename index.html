@@ -3,296 +3,154 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Budget Buddy - Expense Tracker</title>
+<title>Budget Buddy - Expenses Tracker</title>
 <style>
-body {
-font-family: Arial, sans-serif;
-margin: 0; padding: 0;
-background: #f7f9fc;
-color: #333;
-}
-.container {
-max-width: 900px;
-margin: 20px auto;
-padding: 15px;
-background: white;
-border-radius: 8px;
-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-h2 {
-text-align: center;
-color: #0077cc;
-}
-input, select, button {
-padding: 8px;
-margin: 5px 0;
-width: 100%;
-box-sizing: border-box;
-border-radius: 4px;
-border: 1px solid #ccc;
-font-size: 1em;
-}
-button {
-background-color: #0077cc;
-color: white;
-border: none;
-cursor: pointer;
-}
-button:hover {
-background-color: #005fa3;
-}
-.message {
-margin-top: 10px;
-min-height: 18px;
-font-weight: bold;
-}
-.error {
-color: #cc0000;
-}
-.success {
-color: green;
-}
-.form-switch {
-text-align: center;
-margin-top: 10px;
-}
-.form-switch a {
-color: #0077cc;
-cursor: pointer;
-text-decoration: underline;
-}
-#trackerPage {
-display: none;
-}
-.welcome {
-font-size: 1.3em;
-margin-bottom: 10px;
-}
-.tips {
-background: #e0f2ff;
-border-left: 4px solid #0077cc;
-padding: 10px;
-margin-bottom: 15px;
-}
-.cards {
-display: flex;
-gap: 15px;
-flex-wrap: wrap;
-}
-.card {
-flex: 1;
-min-width: 260px;
-background: #f0f9ff;
-padding: 15px;
-border-radius: 6px;
-}
-.card h3 {
-margin-top: 0;
-color: #0077cc;
-}
-label {
-font-weight: bold;
-display: block;
-margin-top: 10px;
-}
-.dynamic-expense {
-display: flex;
-gap: 10px;
-margin-top: 5px;
-}
-.dynamic-expense input[type="text"] {
-flex: 2;
-}
-.dynamic-expense input[type="number"] {
-flex: 1;
-}
-.dynamic-expense button {
-flex: 0 0 28px;
-background: #cc0000;
-font-weight: bold;
-font-size: 18px;
-line-height: 1;
-padding: 0;
-border-radius: 4px;
-}
-.summary {
-margin-top: 15px;
-background: #d9f7be;
-border-left: 4px solid #52c41a;
-padding: 15px;
-}
-.summary div {
-margin: 6px 0;
-}
-.praise-message.success {
-color: green;
-font-weight: bold;
-margin-top: 10px;
-}
-.praise-message.cheer {
-color: #cc5500;
-font-weight: bold;
-margin-top: 10px;
-}
-table {
-width: 100%;
-border-collapse: collapse;
-margin-top: 20px;
-font-size: 0.9em;
-}
-th, td {
-padding: 8px;
-border: 1px solid #ddd;
-text-align: center;
-}
-th {
-background-color: #0077cc;
-color: white;
-}
-#logoutBtn {
-margin-top: 10px;
-background: #cc0000;
-}
-@media (max-width: 600px) {
-.cards {
-flex-direction: column;
-}
-}
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f4f7f8;
+    color: #333;
+  }
+  h2 { color: #2a8fbd; }
+  section { margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], select {
+    padding: 8px; margin: 5px 0 15px 0; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;
+  }
+  button {
+    background-color: #2a8fbd; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;
+  }
+  button:hover { background-color: #1f668a; }
+  a { color: #2a8fbd; cursor: pointer; }
+  .hidden { display: none; }
+  .flex-row { display: flex; gap: 10px; }
+  .dynamic-expense { display: flex; gap: 10px; margin-bottom: 10px; }
+  .dynamic-expense input[type="text"], .dynamic-expense input[type="number"] { flex: 1; }
+  .remove-expense-btn { background: #c0392b; border-radius: 4px; color: white; padding: 5px 10px; }
+  .remove-expense-btn:hover { background: #86281e; }
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 15px;
+  }
+  table, th, td {
+    border: 1px solid #ccc;
+  }
+  th, td {
+    padding: 8px; text-align: center;
+  }
+  .praise-message.success { color: green; font-weight: bold; }
+  .praise-message.cheer { color: orange; font-weight: bold; }
+  #calc-message { color: red; margin-top: 10px; }
 </style>
 </head>
 <body>
-<div class="container">
 
 <!-- LOGIN FORM -->
-<div id="loginForm">
-<h2>Budget Buddy - Login</h2>
-<input type="email" id="loginEmail" placeholder="Email" />
-<input type="password" id="loginPassword" placeholder="Password" />
-<button id="loginBtn">Login</button>
-<div class="message error" id="loginError"></div>
-<div class="form-switch">
-No account? <a id="showSignupLink">Signup here</a> | <a id="showForgotLink">Forgot Password?</a>
-</div>
-</div>
+<section id="login-form">
+  <h2>Login - Budget Buddy</h2>
+  <form>
+    <label>Email</label>
+    <input type="email" id="login-email" required />
+    <label>Password</label>
+    <input type="password" id="login-password" required />
+    <button type="submit">Login</button>
+  </form>
+  <p><a id="signup-link">Don't have an account? Signup here</a></p>
+  <p><a id="forgot-password-link">Forgot Password?</a></p>
+</section>
 
 <!-- SIGNUP FORM -->
-<div id="signupForm" style="display:none;">
-<h2>Budget Buddy - Signup</h2>
-<input type="text" id="signupNickname" placeholder="Nickname" />
-<input type="email" id="signupEmail" placeholder="Email" />
-<input type="password" id="signupPassword" placeholder="Password (min 6 chars)" />
-<button id="signupBtn">Signup</button>
-<div class="message error" id="signupError"></div>
-<div class="form-switch">
-Already have an account? <a id="showLoginLink">Login here</a>
-</div>
-</div>
+<section id="signup-form" class="hidden">
+  <h2>Signup - Budget Buddy</h2>
+  <form>
+    <label>Nickname</label>
+    <input type="text" id="signup-nickname" required />
+    <label>Email</label>
+    <input type="email" id="signup-email" required />
+    <label>Password</label>
+    <input type="password" id="signup-password" required />
+    <button type="submit">Signup</button>
+  </form>
+  <p><a id="login-link">Already have an account? Login here</a></p>
+</section>
 
-<!-- FORGOT PASSWORD FORM -->
-<div id="forgotForm" style="display:none;">
-<h2>Budget Buddy - Forgot Password</h2>
-<input type="email" id="forgotEmail" placeholder="Enter your email" />
-<button id="forgotSendBtn">Send Reset Email</button>
-<div class="message success" id="forgotMessage"></div>
-<div class="message error" id="forgotError"></div>
-<div class="form-switch">
-Back to <a id="showLoginFromForgot">Login</a>
-</div>
-</div>
+<!-- TRACKER SECTION -->
+<section id="tracker-section" class="hidden">
+  <h2>Welcome, <span id="welcome-nickname">Student</span>!</h2>
+  <button id="logout-btn">Logout</button>
 
-<!-- TRACKER PAGE -->
-<div id="trackerPage" style="display:none;">
-<div class="welcome">Welcome, <span id="nicknameDisplay"></span>!</div>
-<button id="logoutBtn">Logout</button>
+  <h3>Smart Tips for Money Management</h3>
+  <ul>
+    <li>Track your expenses daily to avoid overspending.</li>
+    <li>Set realistic saving targets and aim to save at least 10% of your allowance.</li>
+    <li>Prioritize fixed expenses like transport and meals before other spending.</li>
+    <li>Review your spending history regularly to identify patterns.</li>
+    <li>Stay motivated and celebrate small wins!</li>
+  </ul>
 
-<div class="tips">
-<strong>Smart Money Management Tips:</strong>
-<ul>
-<li>Set realistic saving goals and track daily expenses.</li>
-<li>Prioritize essential expenses first.</li>
-<li>Use the 10% rule: save at least 10% of your allowance.</li>
-<li>Limit discretionary spending and avoid impulsive buys.</li>
-<li>Review your expenses regularly and adjust your budget.</li>
-</ul>
-</div>
+  <h3>Track Your Expenses</h3>
+  <label>Date:</label>
+  <input type="date" id="date-picker" required />
 
-<label for="datePicker">Date:</label>
-<input type="date" id="datePicker" />
+  <label>Allowance (₱):</label>
+  <input type="number" id="allowance" min="0" step="0.01" required />
 
-<div class="cards">
-<div class="card">
-<h3>Allowance</h3>
-<input type="number" id="allowanceInput" min="0" step="0.01" placeholder="Enter your allowance" />
-</div>
-<div class="card">
-<h3>Fixed Expenses</h3>
-<label>Transportation:</label>
-<input type="number" id="transportInput" min="0" step="0.01" value="0" />
-<label>Meal or Snacks:</label>
-<input type="number" id="mealInput" min="0" step="0.01" value="0" />
-</div>
-<div class="card">
-<h3>Other Expenses <button id="addExpenseBtn" title="Add other expense">+</button></h3>
-<div id="dynamicExpensesContainer"></div>
-</div>
-</div>
+  <div class="flex-row">
+    <div style="flex:1">
+      <label>Fixed Transportation (₱):</label>
+      <input type="number" id="transport" min="0" step="0.01" value="0" required />
+    </div>
+    <div style="flex:1">
+      <label>Fixed Meal/Snacks (₱):</label>
+      <input type="number" id="meal" min="0" step="0.01" value="0" required />
+    </div>
+  </div>
 
-<button id="calculateBtn" style="margin-top:15px;">Calculate</button>
-<button id="submitBtn" style="margin-top:15px;">Submit</button>
+  <h4>Other Expenses</h4>
+  <div id="dynamic-expenses"></div>
+  <button id="add-expense-btn" type="button">+ Add Other Expense</button>
 
-<div class="summary">
-<div>Allowance: ₱<span id="summaryAllowance">0.00</span></div>
-<div>Total Expenses: ₱<span id="summaryExpenses">0.00</span></div>
-<div>Remaining Balance: ₱<span id="summaryRemaining">0.00</span></div>
-<div>Target Saving (10%): ₱<span id="summaryTargetSaving">0.00</span></div>
-<div>Actual Savings: ₱<span id="summaryActualSaving">0.00</span></div>
-</div>
+  <br/><br/>
+  <button id="submit-btn">Submit & Calculate</button>
+  <p id="calc-message"></p>
 
-<div class="praise-message" id="praiseMessage"></div>
-<div class="message error" id="calcMessage"></div>
+  <h3>Today's Summary</h3>
+  <p>Allowance: ₱<span id="summary-allowance">0.00</span></p>
+  <p>Total Expenses: ₱<span id="summary-expenses">0.00</span></p>
+  <p>Remaining Balance: ₱<span id="summary-remaining">0.00</span></p>
+  <p>Target Saving (10%): ₱<span id="summary-target-saving">0.00</span></p>
+  <p>Actual Savings: ₱<span id="summary-actual-saving">0.00</span></p>
+  <p class="praise-message" id="praise-message"></p>
 
-<h3>History</h3>
-<div>
-Filter by:
-<select id="filterMonth">
-<option value="all">All Months</option>
-<option value="1">January</option>
-<option value="2">February</option>
-<option value="3">March</option>
-<option value="4">April</option>
-<option value="5">May</option>
-<option value="6">June</option>
-<option value="7">July</option>
-<option value="8">August</option>
-<option value="9">September</option>
-<option value="10">October</option>
-<option value="11">November</option>
-<option value="12">December</option>
-</select>
-<select id="filterYear"></select>
-</div>
+  <h3>History</h3>
+  <label>Filter by Month:</label>
+  <select id="filter-month">
+    <option value="all">All Months</option>
+    <option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option>
+    <option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option>
+    <option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+  </select>
 
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th>Allowance</th>
-<th>Transportation</th>
-<th>Meal/Snacks</th>
-<th>Other Expenses</th>
-<th>Total Expenses</th>
-<th>Remaining Balance</th>
-<th>Actual Savings</th>
-</tr>
-</thead>
-<tbody id="historyTableBody">
-<tr><td colspan="8">No data available.</td></tr>
-</tbody>
-</table>
-</div>
-</div>
+  <label>Filter by Year:</label>
+  <select id="filter-year"><option value="all">All Years</option></select>
 
-<!-- Firebase SDKs -->
+  <table>
+    <thead>
+      <tr>
+        <th>Date (MM/DD/YYYY)</th>
+        <th>Allowance (₱)</th>
+        <th>Transportation (₱)</th>
+        <th>Meal/Snacks (₱)</th>
+        <th>Other Expenses</th>
+        <th>Total Expenses (₱)</th>
+        <th>Remaining Balance (₱)</th>
+        <th>Actual Savings (₱)</th>
+      </tr>
+    </thead>
+    <tbody id="history-table-body">
+      <tr><td colspan="8">No data available.</td></tr>
+    </tbody>
+  </table>
+</section>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
   import {
@@ -310,7 +168,6 @@ Filter by:
     get,
   } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-  // Firebase config and init (replace with your config)
   const firebaseConfig = {
     apiKey: "AIzaSyAc8HGycdVUdQ_zR9qLu2c-j3bSCkPJj5M",
     authDomain: "budgetbuddy-b0b79.firebaseapp.com",
@@ -325,7 +182,7 @@ Filter by:
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  // DOM elements
+  // Elements
   const loginForm = document.getElementById("login-form");
   const signupForm = document.getElementById("signup-form");
   const trackerSection = document.getElementById("tracker-section");
@@ -353,160 +210,143 @@ Filter by:
   const filterMonth = document.getElementById("filter-month");
   const filterYear = document.getElementById("filter-year");
 
-  // Utilities
+  // Login form inputs
+  const loginEmail = document.getElementById("login-email");
+  const loginPassword = document.getElementById("login-password");
+
+  // Signup form inputs
+  const signupNickname = document.getElementById("signup-nickname");
+  const signupEmail = document.getElementById("signup-email");
+  const signupPassword = document.getElementById("signup-password");
+
+  // Links
+  const signupLink = document.getElementById("signup-link");
+  const loginLink = document.getElementById("login-link");
+  const forgotPasswordLink = document.getElementById("forgot-password-link");
+
+  // Helper functions
+  function showLogin() {
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
+    trackerSection.classList.add("hidden");
+    clearMessages();
+  }
+  function showSignup() {
+    loginForm.classList.add("hidden");
+    signupForm.classList.remove("hidden");
+    trackerSection.classList.add("hidden");
+    clearMessages();
+  }
+  function showTracker() {
+    loginForm.classList.add("hidden");
+    signupForm.classList.add("hidden");
+    trackerSection.classList.remove("hidden");
+    clearMessages();
+  }
+  function clearMessages() {
+    calcMessage.textContent = "";
+    praiseMessage.textContent = "";
+  }
+  function setDefaultDateToTodayPH() {
+    // PH timezone offset is UTC+8
+    const now = new Date();
+    // Convert current UTC time to PH time (UTC+8)
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const phDate = new Date(utc + 8 * 3600000);
+    datePicker.value = phDate.toISOString().slice(0, 10);
+  }
+
   function clearTrackerInputs() {
     allowanceInput.value = "";
-    transportInput.value = "";
-    mealInput.value = "";
+    transportInput.value = "0";
+    mealInput.value = "0";
     dynamicExpensesContainer.innerHTML = "";
-    praiseMessage.textContent = "";
-    calcMessage.textContent = "";
     summaryAllowance.textContent = "0.00";
     summaryExpenses.textContent = "0.00";
     summaryRemaining.textContent = "0.00";
     summaryTargetSaving.textContent = "0.00";
     summaryActualSaving.textContent = "0.00";
-  }
-
-  function setDefaultDateToTodayPH() {
-    // Philippine timezone offset +8
-    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
-    datePicker.value = now.toISOString().split("T")[0];
-  }
-
-  // Show/hide views
-  function showLogin() {
-    loginForm.style.display = "block";
-    signupForm.style.display = "none";
-    trackerSection.style.display = "none";
-  }
-  function showSignup() {
-    loginForm.style.display = "none";
-    signupForm.style.display = "block";
-    trackerSection.style.display = "none";
-  }
-  function showTracker() {
-    loginForm.style.display = "none";
-    signupForm.style.display = "none";
-    trackerSection.style.display = "block";
-  }
-
-  // Signup and login form handling (unchanged)
-
-  document.getElementById("signup-link").addEventListener("click", e => {
-    e.preventDefault();
-    showSignup();
-  });
-
-  document.getElementById("login-link").addEventListener("click", e => {
-    e.preventDefault();
-    showLogin();
-  });
-
-  signupForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const nickname = document.getElementById("signup-nickname").value.trim();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value;
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      await set(ref(db, "users/" + user.uid), { nickname, email });
-      signupForm.reset();
-      alert("Signup successful. Please login.");
-      showLogin();
-    } catch (error) {
-      alert("Signup error: " + error.message);
-    }
-  });
-
-  loginForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      loginForm.reset();
-    } catch (error) {
-      alert("Login error: " + error.message);
-    }
-  });
-
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-  });
-
-  // Add dynamic expense row
-  addExpenseBtn.addEventListener("click", () => {
-    const div = document.createElement("div");
-    div.classList.add("dynamic-expense");
-    div.innerHTML = `
-      <input type="text" placeholder="Description" required />
-      <input type="number" min="0" step="0.01" placeholder="Amount" required />
-      <button type="button" class="remove-expense-btn">X</button>
-    `;
-    dynamicExpensesContainer.appendChild(div);
-
-    div.querySelector(".remove-expense-btn").addEventListener("click", () => {
-      dynamicExpensesContainer.removeChild(div);
-    });
-  });
-
-  // Combined calculate & submit function
-  submitBtn.addEventListener("click", async () => {
-    calcMessage.textContent = "";
     praiseMessage.textContent = "";
+    calcMessage.textContent = "";
+    filterMonth.value = "all";
+    filterYear.value = "all";
+  }
+
+  // Add dynamic expense input
+  function addDynamicExpenseItem(name = "", amount = "") {
+    const div = document.createElement("div");
+    div.className = "dynamic-expense";
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Expense name";
+    nameInput.value = name;
+    nameInput.required = true;
+
+    const amountInput = document.createElement("input");
+    amountInput.type = "number";
+    amountInput.min = "0";
+    amountInput.step = "0.01";
+    amountInput.placeholder = "Amount (₱)";
+    amountInput.value = amount;
+    amountInput.required = true;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "Remove";
+    removeBtn.className = "remove-expense-btn";
+    removeBtn.onclick = () => div.remove();
+
+    div.appendChild(nameInput);
+    div.appendChild(amountInput);
+    div.appendChild(removeBtn);
+
+    dynamicExpensesContainer.appendChild(div);
+  }
+
+  // Calculate and submit handler
+  async function handleCalculateAndSubmit() {
+    clearMessages();
 
     const allowance = parseFloat(allowanceInput.value);
-    const transport = parseFloat(transportInput.value);
-    const meal = parseFloat(mealInput.value);
-    const date = datePicker.value;
-
-    if (!date) {
-      calcMessage.textContent = "Please select a date.";
-      return;
-    }
     if (isNaN(allowance) || allowance < 0) {
       calcMessage.textContent = "Please enter a valid allowance.";
       return;
     }
-    if (isNaN(transport) || transport < 0) {
-      calcMessage.textContent = "Please enter valid fixed transport expense.";
-      return;
-    }
-    if (isNaN(meal) || meal < 0) {
-      calcMessage.textContent = "Please enter valid fixed meal/snacks expense.";
-      return;
-    }
 
-    // Collect dynamic other expenses
-    let otherExpenses = [];
-    const rows = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
-    for (const row of rows) {
-      const descInput = row.querySelector("input[type='text']");
-      const amtInput = row.querySelector("input[type='number']");
-      const desc = descInput.value.trim();
-      const amt = parseFloat(amtInput.value);
-      if (!desc) {
-        calcMessage.textContent = "Please enter description for all other expenses.";
+    const transport = parseFloat(transportInput.value) || 0;
+    const meal = parseFloat(mealInput.value) || 0;
+
+    // Validate dynamic expenses
+    const otherExpensesDivs = dynamicExpensesContainer.querySelectorAll(".dynamic-expense");
+    let otherExpensesTotal = 0;
+    const otherExpensesList = [];
+    for (const div of otherExpensesDivs) {
+      const inputs = div.querySelectorAll("input");
+      const name = inputs[0].value.trim();
+      const amount = parseFloat(inputs[1].value);
+      if (!name) {
+        calcMessage.textContent = "Please fill all other expense names.";
         return;
       }
-      if (isNaN(amt) || amt < 0) {
-        calcMessage.textContent = "Please enter valid amounts for all other expenses.";
+      if (isNaN(amount) || amount < 0) {
+        calcMessage.textContent = "Please enter valid amounts for other expenses.";
         return;
       }
-      otherExpenses.push({ description: desc, amount: amt });
+      otherExpensesList.push({ name, amount });
+      otherExpensesTotal += amount;
     }
 
-    const totalOther = otherExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const totalExpenses = transport + meal + totalOther;
+    const totalExpenses = transport + meal + otherExpensesTotal;
     const remaining = allowance - totalExpenses;
-    const targetSaving = allowance * 0.1;
-    const actualSaving = Math.max(0, remaining);
+    if (remaining < 0) {
+      calcMessage.textContent = "Warning: Your expenses exceed your allowance!";
+    }
 
-    // Show summary
+    const targetSaving = allowance * 0.10;
+    const actualSaving = remaining > 0 ? remaining : 0;
+
+    // Update summary display
     summaryAllowance.textContent = allowance.toFixed(2);
     summaryExpenses.textContent = totalExpenses.toFixed(2);
     summaryRemaining.textContent = remaining.toFixed(2);
@@ -514,143 +354,196 @@ Filter by:
     summaryActualSaving.textContent = actualSaving.toFixed(2);
 
     // Praise or cheer messages
-    const praiseMsgs = [
-      "Awesome! You're hitting your savings goals! 🎉",
-      "Great job saving today! Keep it up! 💪",
-      "You're doing fantastic managing your money! 🌟",
-      "Savings on point! You're a budget pro! 👏",
-      "Way to go! Your financial habits rock! 🚀",
+    const praiseMessages = [
+      "Great job! You're hitting your savings target!",
+      "Awesome! Keep up the smart spending!",
+      "You're managing your money wisely!",
+      "Fantastic! You're on track with your savings!",
+      "Keep it up! Saving smartly is the key!"
     ];
-    const cheerMsgs = [
-      "Don't give up! Every penny counts! 😊",
-      "Keep pushing! Your goals are within reach! 💪",
-      "Stay motivated! You're improving every day! 🌱",
-      "Cheer up! Small steps lead to big savings! ✨",
-      "You got this! Tomorrow is a new chance! 🌞",
+    const cheerMessages = [
+      "Don't worry, every penny counts! Try again tomorrow!",
+      "Keep pushing! You can achieve your savings target!",
+      "Stay positive! Smart money habits take time!",
+      "You're learning and growing! Keep going!",
+      "Every effort counts! Don't give up!"
     ];
 
     if (actualSaving >= targetSaving) {
-      praiseMessage.textContent = praiseMsgs[Math.floor(Math.random() * praiseMsgs.length)];
+      const msg = praiseMessages[Math.floor(Math.random() * praiseMessages.length)];
+      praiseMessage.textContent = msg;
       praiseMessage.className = "praise-message success";
     } else {
-      praiseMessage.textContent = cheerMsgs[Math.floor(Math.random() * cheerMsgs.length)];
+      const msg = cheerMessages[Math.floor(Math.random() * cheerMessages.length)];
+      praiseMessage.textContent = msg;
       praiseMessage.className = "praise-message cheer";
     }
 
     // Save data to Firebase
     const user = auth.currentUser;
     if (!user) {
-      calcMessage.textContent = "User not authenticated. Please login again.";
-      showLogin();
+      calcMessage.textContent = "User not authenticated.";
       return;
     }
 
-    const expenseData = {
-      date,
-      allowance,
-      transport,
-      meal,
-      otherExpenses,
-      totalExpenses,
-      remaining,
-      actualSaving,
-      timestamp: Date.now(),
+    const dataToSave = {
+      date: datePicker.value,
+      allowance: allowance,
+      transportation: transport,
+      meal: meal,
+      otherExpenses: otherExpensesList,
+      totalExpenses: totalExpenses,
+      remainingBalance: remaining,
+      targetSaving: targetSaving,
+      actualSaving: actualSaving,
+      timestamp: Date.now()
     };
 
     try {
-      await set(ref(db, `expenses/${user.uid}/${date}`), expenseData);
-      calcMessage.textContent = "";
-      // Refresh history table
+      await set(ref(db, `expenses/${user.uid}/${dataToSave.date}`), dataToSave);
       loadHistory();
       clearTrackerInputs();
-      setDefaultDateToTodayPH();
     } catch (error) {
       calcMessage.textContent = "Failed to save expense: " + error.message;
     }
+  }
+
+  // Load history data from Firebase and render table with filters
+  async function loadHistory() {
+    historyTableBody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
+    const user = auth.currentUser;
+    if (!user) {
+      historyTableBody.innerHTML = "<tr><td colspan='8'>Not logged in.</td></tr>";
+      return;
+    }
+    try {
+      const snapshot = await get(ref(db, `expenses/${user.uid}`));
+      const data = snapshot.val();
+      if (!data) {
+        historyTableBody.innerHTML = "<tr><td colspan='8'>No data available.</td></tr>";
+        return;
+      }
+
+      // Flatten data into an array, sort descending by date
+      const entries = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Populate year filter options dynamically
+      const yearsSet = new Set();
+      entries.forEach(e => yearsSet.add(e.date.slice(0,4)));
+      const years = Array.from(yearsSet).sort();
+      filterYear.innerHTML = `<option value="all">All Years</option>` +
+        years.map(y => `<option value="${y}">${y}</option>`).join("");
+
+      // Filter entries based on month and year filter
+      const selectedMonth = filterMonth.value;
+      const selectedYear = filterYear.value;
+
+      const filteredEntries = entries.filter(e => {
+        const [y, m] = e.date.split("-");
+        if (selectedMonth !== "all" && parseInt(m) !== parseInt(selectedMonth)) return false;
+        if (selectedYear !== "all" && y !== selectedYear) return false;
+        return true;
+      });
+
+      if (filteredEntries.length === 0) {
+        historyTableBody.innerHTML = "<tr><td colspan='8'>No data available for selected filters.</td></tr>";
+        return;
+      }
+
+      historyTableBody.innerHTML = "";
+      for (const entry of filteredEntries) {
+        const dateParts = entry.date.split("-");
+        const formattedDate = `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`;
+        // Sum other expenses amounts for display
+        const otherSum = entry.otherExpenses.reduce((acc, cur) => acc + cur.amount, 0);
+        const otherExpensesStr = entry.otherExpenses.length
+          ? entry.otherExpenses.map(oe => `${oe.name}:₱${oe.amount.toFixed(2)}`).join(", ")
+          : "-";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${formattedDate}</td>
+          <td>₱${entry.allowance.toFixed(2)}</td>
+          <td>₱${entry.transportation.toFixed(2)}</td>
+          <td>₱${entry.meal.toFixed(2)}</td>
+          <td>${otherExpensesStr}</td>
+          <td>₱${entry.totalExpenses.toFixed(2)}</td>
+          <td>₱${entry.remainingBalance.toFixed(2)}</td>
+          <td>₱${entry.actualSaving.toFixed(2)}</td>
+        `;
+        historyTableBody.appendChild(tr);
+      }
+    } catch (error) {
+      historyTableBody.innerHTML = `<tr><td colspan="8">Error loading history: ${error.message}</td></tr>`;
+    }
+  }
+
+  // Event Listeners
+
+  // Login submit
+  loginForm.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearMessages();
+    try {
+      await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+      loginEmail.value = "";
+      loginPassword.value = "";
+    } catch (error) {
+      alert("Login failed: " + error.message);
+    }
   });
 
-  // Load history (unchanged from before)
-  async function loadHistory() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const expensesRef = ref(db, `expenses/${user.uid}`);
-    const snapshot = await get(expensesRef);
-    const data = snapshot.val();
-
-    if (!data) {
-      historyTableBody.innerHTML = `<tr><td colspan="8">No data available.</td></tr>`;
-      populateYearFilter([]);
-      return;
+  // Signup submit
+  signupForm.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearMessages();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, signupEmail.value, signupPassword.value);
+      // Save nickname in Realtime Database
+      await set(ref(db, `users/${userCredential.user.uid}`), {
+        nickname: signupNickname.value.trim()
+      });
+      signupNickname.value = "";
+      signupEmail.value = "";
+      signupPassword.value = "";
+    } catch (error) {
+      alert("Signup failed: " + error.message);
     }
+  });
 
-    const expensesArray = [];
-    Object.entries(data).forEach(([dateKey, expense]) => {
-      expensesArray.push({ date: dateKey, ...expense });
-    });
+  // Logout
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth);
+  });
 
-    const yearsSet = new Set(expensesArray.map(e => new Date(e.date).getFullYear()));
-    populateYearFilter(Array.from(yearsSet).sort());
+  // Navigation links
+  signupLink.addEventListener("click", () => showSignup());
+  loginLink.addEventListener("click", () => showLogin());
 
-    renderHistoryTable(expensesArray);
-  }
-
-  function populateYearFilter(years) {
-    filterYear.innerHTML = '<option value="all">All Years</option>';
-    years.forEach(year => {
-      const option = document.createElement("option");
-      option.value = year;
-      option.textContent = year;
-      filterYear.appendChild(option);
-    });
-  }
-
-  function renderHistoryTable(dataArray) {
-    const monthVal = filterMonth.value;
-    const yearVal = filterYear.value;
-
-    let filtered = dataArray;
-
-    if (monthVal !== "all") {
-      filtered = filtered.filter(e => (new Date(e.date).getMonth() + 1) == monthVal);
+  // Forgot Password
+  forgotPasswordLink.addEventListener("click", () => {
+    const email = prompt("Enter your email address to reset password:");
+    if (email) {
+      sendPasswordResetEmail(auth, email)
+        .then(() => alert("Password reset email sent. Please check your inbox."))
+        .catch(e => alert("Failed to send reset email: " + e.message));
     }
-    if (yearVal !== "all") {
-      filtered = filtered.filter(e => (new Date(e.date).getFullYear()) == yearVal);
-    }
+  });
 
-    if (filtered.length === 0) {
-      historyTableBody.innerHTML = `<tr><td colspan="8">No data available for selected filter.</td></tr>`;
-      return;
-    }
+  // Add dynamic expense button
+  addExpenseBtn.addEventListener("click", () => addDynamicExpenseItem());
 
-    filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+  // Submit & Calculate button
+  submitBtn.addEventListener("click", handleCalculateAndSubmit);
 
-    let html = "";
-    filtered.forEach(e => {
-      let otherDescAmounts = e.otherExpenses?.map(oe => `${oe.description}: ₱${oe.amount.toFixed(2)}`).join(", ") || "-";
-
-      html += `<tr>
-        <td>${e.date}</td>
-        <td>₱${parseFloat(e.allowance).toFixed(2)}</td>
-        <td>₱${parseFloat(e.transport).toFixed(2)}</td>
-        <td>₱${parseFloat(e.meal).toFixed(2)}</td>
-        <td>${otherDescAmounts}</td>
-        <td>₱${parseFloat(e.totalExpenses).toFixed(2)}</td>
-        <td>₱${parseFloat(e.remaining).toFixed(2)}</td>
-        <td>₱${parseFloat(e.actualSaving).toFixed(2)}</td>
-      </tr>`;
-    });
-
-    historyTableBody.innerHTML = html;
-  }
-
+  // Filters for history reload
   filterMonth.addEventListener("change", loadHistory);
   filterYear.addEventListener("change", loadHistory);
 
-  // Auth state listener to toggle views
-  onAuthStateChanged(auth, async user => {
+  // Auth state change
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
-      const snapshot = await get(ref(db, "users/" + user.uid));
+      // Load user nickname
+      const snapshot = await get(ref(db, `users/${user.uid}`));
       const userData = snapshot.val();
       welcomeNickname.textContent = userData?.nickname || "Student";
 
@@ -664,5 +557,6 @@ Filter by:
   });
 
 </script>
+
 </body>
 </html>
